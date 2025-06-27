@@ -1,0 +1,148 @@
+/*------------------------------
+  Google Font
+------------------------------*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/*------------------------------
+  Keyframe Animations
+------------------------------*/
+/* Background gradient movement */
+@keyframes gradientBG {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Fade in from above */
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Bounce in effect */
+@keyframes bounceIn {
+  0%   { opacity: 0; transform: scale(0.5); }
+  60%  { opacity: 1; transform: scale(1.1); }
+  80%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* Flicker for status */
+@keyframes flicker {
+  0%,100% { opacity:1; }
+  50%     { opacity:0.7; }
+}
+
+/*------------------------------
+  Global Styles
+------------------------------*/
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  /* animated gradient */
+  background: linear-gradient(135deg, #667eea, #764ba2, #e53e3e, #f6e05e);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Utility to center */
+.fullscreen-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/*------------------------------
+  Login Card
+------------------------------*/
+.login-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  padding: 2rem;
+  width: 360px;
+  text-align: center;
+  /* drop in */
+  animation: fadeInDown 0.8s ease-out both;
+}
+
+/* form controls */
+.login-card .form-control {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+}
+
+/* button */
+.login-card .btn-login {
+  background: #5a67d8;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  font-weight: 600;
+  color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.login-card .btn-login:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/*------------------------------
+  Navbar
+------------------------------*/
+.navbar-custom {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.navbar-custom .navbar-brand {
+  font-weight: 600;
+  color: #5a67d8;
+}
+.navbar-custom .navbar-text {
+  font-weight: 400;
+  color: #4a5568;
+}
+.navbar-custom .btn-logout {
+  border-radius: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.navbar-custom .btn-logout:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/*------------------------------
+  Video & Status
+------------------------------*/
+.video-container {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+.video-wrapper {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  /* bounce in */
+  animation: bounceIn 1s ease-out 0.5s both;
+}
+
+#video {
+  display: block;
+}
+
+#status {
+  margin-top: 1rem;
+  font-weight: 500;
+  color: #f7fafc;
+  /* subtle flicker ready */
+}
+#status.pulse {
+  animation: flicker 1.5s ease-in-out;
+}

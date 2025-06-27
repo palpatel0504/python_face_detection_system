@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}User Management{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h3 class="mb-4">User Management</h3>
+
+  <!-- Add User Form -->
+  <form method="post" class="row g-2 mb-4">
+    <input type="hidden" name="action" value="add">
+    <div class="col-auto">
+      <input name="new_username" class="form-control" placeholder="New Username" required>
+    </div>
+    <div class="col-auto">
+      <input name="new_password" type="password" class="form-control" placeholder="New Password" required>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-success">Add User</button>
+    </div>
+  </form>
+
+  <!-- Existing Users Table -->
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead class="table-light">
+        <tr><th>#</th><th>Username</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ u.username }}</td>
+          <td>
+            <a href="{{ url_for('admin', delete=u.username) }}"
+               class="btn btn-sm btn-danger"
+               onclick="return confirm('Delete {{u.username}}?');">
+               Delete
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

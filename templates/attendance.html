@@ -1,0 +1,127 @@
+{% extends "base.html" %} {% block title %}Face Recognition{% endblock %} {%
+block content %}
+
+<div class="container text-center">
+  <div class="video-container">
+    <div class="video-wrapper">
+      <video
+        id="video"
+        width="640"
+        height="480"
+        autoplay
+        muted
+        playsinline
+        style="display: block; margin: 0 auto"
+      ></video>
+    </div>
+  </div>
+
+  <div id="status">🔄 Initializing camera…</div>
+
+  <!-- Hidden form to register face -->
+  <div
+    id="register-form"
+    class="hidden form container"
+    style="display: none; margin-top: 20px; width: 640px"
+  >
+    <h4>👤 Unrecognized Face — Add to System</h4>
+    <form id="addUserForm">
+      <input
+        type="text"
+        id="newUserName"
+        placeholder="Enter Name"
+        required
+        class="form-control"
+      />
+      <input type="hidden" id="newUserImage" class="form-control" />
+      <button type="submit" class="btn btn-primary mt-2">
+        Register & Retrain
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  (async function () {
+    const video = document.getElementById("video");
+    const status = document.getElementById("status");
+    const form = document.getElementById("addUserForm");
+    const nameInput = document.getElementById("newUserName");
+    const imageInput = document.getElementById("newUserImage");
+    const registerForm = document.getElementById("register-form");
+
+    let lastImageData = "";
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+      await new Promise((res) => video.addEventListener("loadedmetadata", res));
+      status.textContent = "📸 Camera on. Scanning for faces…";
+    } catch (err) {
+      console.error("Camera error:", err);
+      status.textContent = "⚠️ Cannot access camera: " + err.message;
+      return;
+    }
+
+    // Show registration form
+    function showRegisterForm(imageData) {
+      lastImageData = imageData;
+      registerForm.style.display = "block";
+      imageInput.value = imageData;
+    }
+
+    // Submit new face to server
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const name = nameInput.value.trim();
+      if (!name) return;
+
+      const saveRes = await fetch("/register_face", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, image: lastImageData }),
+      });
+      const saveData = await saveRes.json();
+      status.textContent = saveData.message || saveData.error;
+
+      const retrainRes = await fetch("/retrain", { method: "POST" });
+      const retrainData = await retrainRes.json();
+      status.textContent = retrainData.message || retrainData.error;
+
+      // Reset form
+      nameInput.value = "";
+      registerForm.style.display = "none";
+    });
+
+    setInterval(async () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d").drawImage(video, 0, 0);
+      const imgData = canvas.toDataURL("image/jpeg", 0.7);
+
+      try {
+        const res = await fetch("/recognize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: imgData }),
+        });
+        const { names } = await res.json();
+
+        console.log("🚀 Detected:", names);
+
+        if (!names || names.length === 0 || names[0] === "Unknown") {
+          status.textContent = "❓ No recognized faces. Please register.";
+          showRegisterForm(imgData); // Show form instead of prompt
+        } else {
+          status.textContent = `✅ Recognized: ${names.join(", ")}`;
+          registerForm.style.display = "none"; // hide if recognized
+        }
+      } catch (e) {
+        console.error("Recognition error:", e);
+        status.textContent = "⚠️ Recognition error";
+      }
+    }, 1500);
+  })();
+</script>
+{% endblock %}
